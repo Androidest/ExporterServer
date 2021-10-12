@@ -26,10 +26,6 @@ namespace ExporterServer.Controllers
                 Console.WriteLine(data.Filename);
             }
 
-            //string path = Path.Combine("./", data.Filename);
-            //byte[] bytes = Convert.FromBase64String(data.FileContent);
-            //System.IO.File.WriteAllBytes(path, bytes);
-            //Console.WriteLine(data.Filename);
             return Ok();
         }
 
