@@ -42,8 +42,16 @@ namespace ExporterShared.Models
 
         public void ToJsonFile(string parentPath)
         {
-            string fullPath = Path.Combine(parentPath, RelativePath);
-            Data = Convert.ToBase64String(File.ReadAllBytes(fullPath));
+            // if parentPath is a file, not folder
+            if (File.Exists(parentPath))
+            {
+                Data = Convert.ToBase64String(File.ReadAllBytes(parentPath));
+            }
+            else
+            {
+                string fullPath = Path.Combine(parentPath, RelativePath);
+                Data = Convert.ToBase64String(File.ReadAllBytes(fullPath));
+            }
         }
     }
 }

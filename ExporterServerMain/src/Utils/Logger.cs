@@ -5,15 +5,21 @@ namespace Utils
 {
     public class Logger : Singleton<Logger>
     {
-        List<string> Logs = new List<string>();
+        string[] Logs = new string[10000];
+        int curPointer = 0;
         int LogPointer = 0;
+
+        private int ToIndex(int pointer)
+        {
+            return pointer % Logs.Length;
+        }
 
         public void AddLog(string msg)
         {
             lock (Logs)
             {
                 Console.WriteLine(msg);
-                Logs.Add(msg);
+                Logs[ToIndex(curPointer++)] = msg;
             }
         }
 
@@ -22,14 +28,11 @@ namespace Utils
             string unread = "";
             lock (Logs)
             {
-                for (int i = LogPointer; i < Logs.Count; ++i)
+                for (int i = LogPointer; i < curPointer; ++i)
                 {
-                    unread += Logs[i] + "\n";
+                    unread += Logs[ToIndex(i)] + "\n";
                 }
-                if (Logs.Count > 0)
-                {
-                    LogPointer = Logs.Count;
-                }
+                LogPointer = curPointer;
             }
             return unread;
         }
