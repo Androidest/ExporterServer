@@ -83,7 +83,10 @@ namespace ExporterServer.Controllers
         [HttpPost]
         public async Task<IActionResult> OnPost_Command([FromBody] Command command)
         {
-            //command.OnProgress += 
+            command.OnProgress += (int execTime) =>
+            {
+                Logger.Instance.AddLog(String.Format("[服务器命令执行] 已执行{0}秒", execTime));
+            };
             Logger.Instance.AddLog("服务器开始接收命令 ...");
             try
             {
