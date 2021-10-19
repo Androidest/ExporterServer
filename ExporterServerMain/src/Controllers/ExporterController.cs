@@ -83,6 +83,7 @@ namespace ExporterServer.Controllers
         [HttpPost]
         public async Task<IActionResult> OnPost_Command([FromBody] Command command)
         {
+            //command.OnProgress += 
             Logger.Instance.AddLog("服务器开始接收命令 ...");
             try
             {

@@ -26,7 +26,7 @@ namespace ExporterServer
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://0.0.0.0:8888", "https://0.0.0.0:8889");
+                    webBuilder.UseUrls("http://0.0.0.0:8888");
                 });
     }
 }
