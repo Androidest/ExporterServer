@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon />
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <StartupObject />
     <Win32Resource />
   </PropertyGroup>
@@ -14,12 +14,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="BehaviacDesigner">
-      <HintPath>..\behaviac\tools\designer\BehaviacDesigner\obj\Debug\BehaviacDesigner.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
