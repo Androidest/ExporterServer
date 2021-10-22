@@ -6,7 +6,7 @@ namespace ExporterShared.Models
 {
     public class Command
     {
-        public delegate void ProgressCallback(int execTime);
+        public delegate void ProgressCallback(int execTime, string output);
         public ProgressCallback OnProgress = null;
         private ProcessStartInfo CommandInfo = null;
 
@@ -45,25 +45,27 @@ namespace ExporterShared.Models
 
         public async Task Execute()
         {
-            int execTime = 0;
             System.Timers.Timer Timer = new System.Timers.Timer();
             Timer.Interval = 1000;
-            Timer.Elapsed += new System.Timers.ElapsedEventHandler((object sender, System.Timers.ElapsedEventArgs e) =>
-            {
-                OnProgress?.Invoke(++execTime);
-            });
-            
-            Timer.Start();
+            int execTime = 0;
+
             try
             {
                 Process proc = Process.Start(CommandInfo);
+                Timer.Elapsed += new System.Timers.ElapsedEventHandler((object sender, System.Timers.ElapsedEventArgs e) =>
+                {
+                    string output = "";
+                    OnProgress?.Invoke(++execTime, output);
+                });
+
+                Timer.Start();
                 await Task.Run(() => proc.WaitForExit());
+                Timer.Close();
             }
             catch(Exception e)
             {
                 throw e;
             }
-            Timer.Close();
         }
     }
 }

@@ -13,17 +13,38 @@ namespace ExporterServer.Controllers
     [ApiController]
     public class ExporterController : ControllerBase
     {
+        private void RemoveSrcDeletedFiles(string targetPath, Dictionary<string, bool> sourcePathDict)
+        {
+            var options = new EnumerationOptions();
+            options.RecurseSubdirectories = true;
+            string[] paths = Directory.GetFiles(targetPath, "*", options);
+            int removeCount = 0;
+
+            for (int i = 0; i < paths.Length; ++i)
+            {
+                string localRelativePath = Path.GetRelativePath(targetPath, paths[i]).Replace('\\', '/');
+                if (!sourcePathDict.ContainsKey(localRelativePath))
+                {
+                    System.IO.File.Delete(paths[i]);
+                    Logger.Instance.AddLog(string.Format("[服务器已删除] {0}. {1}", ++removeCount, localRelativePath));
+                }
+            }
+            Logger.Instance.AddLog(String.Format("服务器已删除 {0} 个文件！", removeCount));
+        }
+
         [DisableRequestSizeLimit]
         [HttpPost]
         public IActionResult OnPost_FileHashes([FromBody] FileList fileList)
         {
             List<FileData> hashesToUpdate = new List<FileData>();
             string targetPath = fileList.TargetPath;
+            Dictionary<string, bool> sourcePathDict = new Dictionary<string, bool>();
 
             try
             {
                 foreach (FileData fileData in fileList.Files)
                 {
+                    sourcePathDict.Add(fileData.RelativePath.Replace('\\', '/'), false);
                     string targetFilePath = Path.Combine(targetPath, fileData.RelativePath);
 
                     // compare the client file hash and the server file hash,
@@ -35,6 +56,8 @@ namespace ExporterServer.Controllers
                         hashesToUpdate.Add(fileData);
                     }
                 }
+
+                RemoveSrcDeletedFiles(targetPath, sourcePathDict);
 
                 return new JsonResult(hashesToUpdate);
             }
@@ -65,7 +88,7 @@ namespace ExporterServer.Controllers
                     byte[] bytes = Convert.FromBase64String(filedata.Data);
                     System.IO.File.WriteAllBytes(fullPath, bytes);
 
-                    Logger.Instance.AddLog(string.Format("已更新 {0}", filedata.RelativePath));
+                    Logger.Instance.AddLog(string.Format("[服务器已更新] {0}", filedata.RelativePath));
                 }
                 Logger.Instance.AddLog(String.Format("服务器已更新 {0} 个文件！", fileList.Files.Length));
 
@@ -83,8 +106,12 @@ namespace ExporterServer.Controllers
         [HttpPost]
         public async Task<IActionResult> OnPost_Command([FromBody] Command command)
         {
-            command.OnProgress += (int execTime) =>
+            command.OnProgress += (int execTime, string output) =>
             {
+                if (string.Empty != output)
+                {
+                    Logger.Instance.AddLog(String.Format("[服务器命令输出] {0}", output));
+                }
                 Logger.Instance.AddLog(String.Format("[服务器命令执行] 已执行{0}秒", execTime));
             };
             Logger.Instance.AddLog("服务器开始接收命令 ...");
