@@ -57,8 +57,12 @@ namespace ExporterServer.Controllers
                     }
                 }
 
-                RemoveSrcDeletedFiles(targetPath, sourcePathDict);
-
+                //危险操作，有可能导致删除整个目录
+                if (1 < fileList.Files.Length)
+                {
+                    RemoveSrcDeletedFiles(targetPath, sourcePathDict);
+                }
+                
                 return new JsonResult(hashesToUpdate);
             }
             catch (Exception e)
@@ -122,6 +126,7 @@ namespace ExporterServer.Controllers
             }
             catch (Exception e)
             {
+                Logger.Instance.AddLog("[命令错误] 命令执行不成功！");
                 Logger.Instance.AddLog(e.Message);
                 return BadRequest(e.Message);
             }

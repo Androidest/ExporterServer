@@ -61,6 +61,10 @@ namespace ExporterShared.Models
                 Timer.Start();
                 await Task.Run(() => proc.WaitForExit());
                 Timer.Close();
+                if (0 != proc.ExitCode)
+                {
+                    throw new Exception(string.Format("命令返回值：{0}", proc.ExitCode));
+                }
             }
             catch(Exception e)
             {
